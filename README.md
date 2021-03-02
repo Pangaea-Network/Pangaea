@@ -1,6 +1,10 @@
 # Pangaea 
 
-Pangaea is the new future of property sale and managment. Buying land and homes can be a daunting landscape with many lawyers, large fees, long waiting periods, and fear of leans/scams, no longer! We at Pangaea envision properties traded with streamlined trustless transactions. We see the future of property to be on the Blockchain giving owners freedoms previously impossible!
+Pangaea is the new future of property sale and managment. Buying land and homes can be a daunting landscape with many lawyers, large fees, long waiting periods, and fear of leans/scams, no longer! We at Pangaea envision properties traded with streamlined trustless transactions. We see the future of property to be on Blockchain giving owners freedoms previously impossible!
+
+## Framework
+
+Pangaea is built on [Substrate](https://substrate.dev), a framework built by Parity, the polkadot development team. Substrate allows us to build custom logic in our runtime, while using extensively tested battle hardened core components from substrate!
 
 ## Getting Started
 
