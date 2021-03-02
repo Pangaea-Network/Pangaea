@@ -1,0 +1,25 @@
+[package]
+name = "pangaea-primitives"
+version = "0.5.0"
+authors = ["Pangaea"]
+edition = "2018"
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false }
+sp-core = { version = "3.0.0", default-features = false }
+sp-runtime = { version = "3.0.0", default-features = false }
+sp-std = { version = "3.0.0", default-features = false}
+sp-io = { version = "3.0.0", default-features = false }
+
+[dev-dependencies]  
+frame-support = { version = "3.0.0" }
+
+[features]
+default = ["std"]
+std = [
+	"codec/std",
+	"sp-runtime/std",
+	"sp-core/std",
+	"sp-std/std",
+	"sp-io/std",
+]

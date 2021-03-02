@@ -1,11 +1,11 @@
 [package]
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-description = 'FRAME pallet template for defining custom runtime logic.'
+authors = ['Pangaea <https://github.com/Pangaea-Network>']
+description = 'FRAME pallet for core deed logic in runtime'
 edition = '2018'
-homepage = 'https://substrate.dev'
-license = 'Unlicense'
-name = 'pallet-template'
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+homepage = 'https://pangaea.dev'
+license = 'GPL-3.0'
+name = 'pallet-create'
+repository = 'https://github.com/Pangaea-Network/Pangaea'
 version = '3.0.0'
 
 [package.metadata.docs.rs]
@@ -16,7 +16,7 @@ targets = ['x86_64-unknown-linux-gnu']
 default-features = false
 features = ['derive']
 package = 'parity-scale-codec'
-version = '2.0.0' 
+version = '2.0.0'
 
 [dependencies]
 frame-support = { default-features = false, version = '3.0.0' }
