@@ -8,31 +8,26 @@ This project contains some configuration files to help get started :hammer_and_w
 
 ### Rust Setup
 
-Follow the [Rust setup instructions](./doc/rust-setup.md) before using the included Makefile to
-build the Node Template.
+Follow the [Rust setup instructions](./doc/rust-setup.md) 
 
-### Makefile
+### Run
 
-This project uses a [Makefile](Makefile) to document helpful commands and make it easier to execute
-them. Get started by running these [`make`](https://www.gnu.org/software/make/manual/make.html)
-targets:
+Use Rust's native `cargo` command to build and launch the template node:
 
-1. `make init` - Run the [init script](scripts/init.sh) to configure the Rust toolchain for
-   [WebAssembly compilation](https://substrate.dev/docs/en/knowledgebase/getting-started/#webassembly-compilation).
-1. `make run` - Build and launch this project in development mode.
-
-The init script and Makefile both specify the version of the
-[Rust nightly compiler](https://substrate.dev/docs/en/knowledgebase/getting-started/#rust-nightly-toolchain)
-that this project depends on.
+```sh
+cargo run --release -- --dev --tmp
+```
 
 ### Build
 
-The `make run` command will perform an initial build. Use the following command to build the node
+The `cargo run` command will perform an initial build. Use the following command to build the node
 without launching it:
 
 ```sh
-make build
+cargo build --release
 ```
+
+
 
 ### Embedded Docs
 
