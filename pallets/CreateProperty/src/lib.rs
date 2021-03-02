@@ -32,7 +32,8 @@ type InnerStreet<T> = StreetAddress<<T as frame_system::Config>::AccountId>;
 decl_storage! {
 	// A unique name is used to ensure that the pallet's storage items are isolated.
 	trait Store for Module<T: Config> as DeedModule {
-		Deed: map hasher(blake2_128_concat) Vec<u8> => InnerStreet<T>;
+        Deed get(fn get_deed): map hasher(blake2_128_concat) Vec<u8> => InnerStreet<T>;
+        IssuerCheck get(fn issuer_check): map hasher(blake2_128_concat) T::AccountId => bool;
 	}
 }
 
@@ -44,6 +45,8 @@ decl_event!(
         PropertyBurn(AccountId, Vec<u8>),
         //Event emitted when property deed is transfered
         DeedTransfer(AccountId, AccountId, Vec<u8>),
+        //Allow to issue land
+        IssuerCreated(AccountId),
     }
 );
 
@@ -54,7 +57,8 @@ decl_error! {
         AddressAlreadyClaimed,
         NotAddressIssuer,
         NoSuchProperty,
-        NotOwner
+        NotOwner,
+        UnpermittedIssuer,
     }
 }
 
@@ -64,7 +68,8 @@ decl_module! {
 		type Error = Error<T>;
 
 		// Events must be initialized if they are used by the pallet.
-		fn deposit_event() = default;
+        fn deposit_event() = default;
+        
         #[weight = 10_000]
         fn create_deed(origin, address: Vec<u8>) {
             // Check that the extrinsic was signed and get the signer.
@@ -78,14 +83,22 @@ decl_module! {
             };
             // Verify that the specified proof has not already been claimed.
             ensure!(!Deed::<T>::contains_key(&address), Error::<T>::AddressAlreadyClaimed);
-            
+            //ensure issuer is allowed to mint new land
+            let check = <IssuerCheck::<T>>::get(&issuer);
+            ensure!(check == true, Error::<T>::UnpermittedIssuer);
             // Store the proof with the sender and block number.
             <Deed<T>>::insert(&address, deed_token);
 
             // Emit an event that the claim was created.
             Self::deposit_event(RawEvent::DeedCreated(issuer, address));
         }
-    
+
+        #[weight = 10000]
+        fn issuer_create(origin) {
+            let who = ensure_signed(origin)?;
+            <IssuerCheck::<T>>::insert(&who, true);
+            Self::deposit_event(RawEvent::IssuerCreated(who));
+        }
 
         
         #[weight = 10_000]

@@ -8,7 +8,7 @@ Pangaea is built on [Substrate](https://substrate.dev), a framework built by Par
 
 ## Getting Started
 
-Let's get pangaea up and running :earth_africa:!
+Let's get Pangaea up and running :earth_africa:!
 
 ### Rust Setup
 
@@ -16,7 +16,7 @@ Follow the [Rust setup instructions](./doc/rust-setup.md)
 
 ### Run
 
-Use Rust's native `cargo` command to build and launch a local pangaea node this will take ~30 minutes to compile so take a break:
+Use Rust's native `cargo` command to build and launch a local pangaea node. This will take ~30 minutes to compile so take a break:
 
 ```sh
 cargo run --release -- --dev --tmp
