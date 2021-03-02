@@ -1,6 +1,6 @@
 # Pangaea 
 
-Pangaea is the new future of property sale and managment. Buying land and homes can be a daunting landscape with many lawyers, large fees, long waiting periods, and fear of leans/scams, no longer! We at Pangaea envision properties traded with streamlined trustless transactions. We see the future of property to be on Blockchain giving owners freedoms previously impossible!
+Pangaea is the new future of property sale and management. Buying land and homes can be a daunting landscape with many lawyers, large fees, long waiting periods, and fear of leans/scams, no longer! We at Pangaea envision properties traded with streamlined trust-less transactions. We see the future of property to be on Block chain giving owners freedoms previously impossible!
 
 ## Framework
 
@@ -8,7 +8,7 @@ Pangaea is built on [Substrate](https://substrate.dev), a framework built by Par
 
 ## Getting Started
 
-This project contains some configuration files to help get started :hammer_and_wrench:
+Let's get pangaea up and running :earth_africa:!
 
 ### Rust Setup
 
@@ -16,7 +16,7 @@ Follow the [Rust setup instructions](./doc/rust-setup.md)
 
 ### Run
 
-Use Rust's native `cargo` command to build and launch the template node:
+Use Rust's native `cargo` command to build and launch a local pangaea node this will take ~30 minutes to compile so take a break:
 
 ```sh
 cargo run --release -- --dev --tmp
