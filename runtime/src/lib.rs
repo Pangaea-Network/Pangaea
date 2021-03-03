@@ -39,9 +39,7 @@ pub use frame_support::{
 };
 use pallet_transaction_payment::CurrencyAdapter;
 
-/// Import the template pallet.
-pub use pallet_template;
-pub use pallet_create;
+pub use pallet_deed;
 pub use primitives::{AccountId, AccountIndex, Balance, BlockNumber, DigestItem, Hash, Index, Signature,};
 /*
 /// An index to a block.
@@ -261,12 +259,8 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
-/// Configure the template pallet in pallets/template.
-impl pallet_template::Config for Runtime {
-	type Event = Event;
-}
-
-impl pallet_create::Config for Runtime {
+/// Configure the deed pallet in pallets/deed
+impl pallet_deed::Config for Runtime {
     type Event = Event;
 }
 
@@ -285,9 +279,8 @@ construct_runtime!(
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
-		// Include the custom logic from the template pallet in the runtime.
-		TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
-        DeedModule: pallet_create::{Module, Call, Storage, Event<T>},
+		// Include the custom logic custom pallet in the runtime.
+        DeedModule: pallet_deed::{Module, Call, Storage, Event<T>},
 	}
 );
 

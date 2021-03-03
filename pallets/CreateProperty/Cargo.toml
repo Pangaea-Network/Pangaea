@@ -4,7 +4,7 @@ description = 'FRAME pallet for core deed logic in runtime'
 edition = '2018'
 homepage = 'https://pangaea.dev'
 license = 'GPL-3.0'
-name = 'pallet-create'
+name = 'pallet-deed'
 repository = 'https://github.com/Pangaea-Network/Pangaea'
 version = '3.0.0'
 
