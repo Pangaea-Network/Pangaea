@@ -4,7 +4,7 @@ Pangaea is the new future of property sale and management. Buying land and homes
 
 ## Framework
 
-Pangaea is built on [Substrate](https://substrate.dev), a framework built by Parity, the polkadot development team. Substrate allows us to build custom logic in our runtime, while using extensively tested battle hardened core components from substrate!
+Pangaea is built on [Substrate](https://substrate.dev), a framework built by Parity, the polkadot development team. Substrate allows us to build custom logic in our runtime, while using battle hardened and extensively tested core components from substrate!
 
 ## Getting Started
 
