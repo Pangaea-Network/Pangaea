@@ -47,6 +47,8 @@ decl_event!(
         DeedTransfer(AccountId, AccountId, Vec<u8>),
         //Allow to issue land
         IssuerCreated(AccountId),
+        //Disallow to issue land
+        IssuerDestroy(AccountId),
     }
 );
 
@@ -58,7 +60,7 @@ decl_error! {
         NotAddressIssuer,
         NoSuchProperty,
         NotOwner,
-        UnpermittedIssuer,
+        UnpermittedIssuer,        
     }
 }
 
@@ -94,10 +96,17 @@ decl_module! {
         }
 
         #[weight = 10000]
-        fn issuer_create(origin) {
-            let who = ensure_signed(origin)?;
-            <IssuerCheck::<T>>::insert(&who, true);
-            Self::deposit_event(RawEvent::IssuerCreated(who));
+        fn issuer_create(origin, minted_issuer: T::AccountId) {
+            let _who = ensure_signed(origin)?;
+            <IssuerCheck::<T>>::insert(&minted_issuer, true);
+            Self::deposit_event(RawEvent::IssuerCreated(minted_issuer));
+        }
+
+        #[weight = 10000]
+        fn issuer_destroy(origin, freeze_issuer: T::AccountId) {
+            let _who = ensure_signed(origin)?;
+            <IssuerCheck::<T>>::insert(&freeze_issuer, false);
+            Self::deposit_event(RawEvent::IssuerDestroy(freeze_issuer));
         }
 
         
