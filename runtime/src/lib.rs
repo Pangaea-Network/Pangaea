@@ -27,7 +27,7 @@ use constants::{time::*, currency::*};
 use pallet_transaction_payment::CurrencyAdapter;
 pub use primitives::{AccountId, AccountIndex, Balance, BlockNumber, DigestItem, Hash, Index, Signature,};
 use static_assertions::const_assert;
-use sp_core::u32_trait::{_1, _2, _3, _5};
+use sp_core::u32_trait::{_1, _2, _3, _4, _5};
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -403,7 +403,7 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 	type PrimeOrigin = MoreThanHalfCouncil;
 	type MembershipInitialized = TechnicalCommittee;
 	type MembershipChanged = TechnicalCommittee;
-}
+} 
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
@@ -446,9 +446,17 @@ impl pallet_treasury::Config for Runtime {
 	type WeightInfo = ();
 }
 
+type ApproveIssuer = EnsureOneOf<
+	AccountId,
+	EnsureRoot<AccountId>,
+	pallet_collective::EnsureProportionAtLeast<_4, _5, AccountId, CouncilCollective>
+>;
+
 /// Configure the deed pallet in pallets/deed
 impl pallet_deed::Config for Runtime {
-    type Event = Event;
+	type Event = Event;
+	type ApproveIssuer = ApproveIssuer;
+	type FreezeOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.

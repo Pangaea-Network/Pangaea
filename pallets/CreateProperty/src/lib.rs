@@ -2,7 +2,7 @@
 // No std library inorder to compile to wasm
 #![cfg_attr(not(feature = "std"), no_std)]
 
-
+use frame_support::traits::{EnsureOrigin};
 use frame_support::{ codec::{Encode, Decode },
     decl_module, decl_storage, decl_event, decl_error, ensure, StorageMap};
 use frame_system::ensure_signed;
@@ -16,7 +16,9 @@ mod tests;
 
 pub trait Config: frame_system::Config {
 	// Define Events  
-	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
+    type ApproveIssuer: EnsureOrigin<Self::Origin>;
+    type FreezeOrigin: EnsureOrigin<Self::Origin>;
 }
 
 //Structures for property deeds
@@ -25,14 +27,15 @@ pub struct StreetAddress<AccountId> {
 	address: Vec<u8>,
     issuer: AccountId,
     owner: AccountId,
+    freeze: bool,
 }
 
-type InnerStreet<T> = StreetAddress<<T as frame_system::Config>::AccountId>;
+type InnerDeed<T> = StreetAddress<<T as frame_system::Config>::AccountId>;
 
 decl_storage! {
 	// A unique name is used to ensure that the pallet's storage items are isolated.
 	trait Store for Module<T: Config> as DeedModule {
-        Deed get(fn get_deed): map hasher(blake2_128_concat) Vec<u8> => InnerStreet<T>;
+        Deed get(fn get_deed): map hasher(blake2_128_concat) Vec<u8> => InnerDeed<T>;
         IssuerCheck get(fn issuer_check): map hasher(blake2_128_concat) T::AccountId => bool;
 	}
 }
@@ -49,6 +52,8 @@ decl_event!(
         IssuerCreated(AccountId),
         //Disallow to issue land
         IssuerDestroy(AccountId),
+        //freeze property
+        FreezeDeed(Vec<u8>),
     }
 );
 
@@ -60,7 +65,10 @@ decl_error! {
         NotAddressIssuer,
         NoSuchProperty,
         NotOwner,
-        UnpermittedIssuer,        
+        NotOwnerOrIssuer,
+        UnpermittedIssuer,
+        PropertyFrozen,
+        NotCouncilMember,        
     }
 }
 
@@ -74,20 +82,20 @@ decl_module! {
         
         #[weight = 10_000]
         fn create_deed(origin, address: Vec<u8>) {
-            // Check that the extrinsic was signed and get the signer.
-            // This function will return an error if the extrinsic is not signed.
-            // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+            // Check that the extrinsic was signed and get the signer.          
             let issuer = ensure_signed(origin)?;
+            //ensure issuer is allowed to mint new land
+            let check = <IssuerCheck::<T>>::get(&issuer);
+            ensure!(check == true, Error::<T>::UnpermittedIssuer);
             let deed_token = StreetAddress {
                 address: address.clone(),
                 issuer: issuer.clone(),
                 owner: issuer.clone(),
+                freeze: false,
             };
             // Verify that the specified proof has not already been claimed.
             ensure!(!Deed::<T>::contains_key(&address), Error::<T>::AddressAlreadyClaimed);
-            //ensure issuer is allowed to mint new land
-            let check = <IssuerCheck::<T>>::get(&issuer);
-            ensure!(check == true, Error::<T>::UnpermittedIssuer);
+                       
             // Store the proof with the sender and block number.
             <Deed<T>>::insert(&address, deed_token);
 
@@ -95,16 +103,18 @@ decl_module! {
             Self::deposit_event(RawEvent::DeedCreated(issuer, address));
         }
 
+        //Allows for an adress to issue deeds, must be approved by referendum
         #[weight = 10000]
         fn issuer_create(origin, minted_issuer: T::AccountId) {
-            let _who = ensure_signed(origin)?;
+            T::ApproveIssuer::ensure_origin(origin)?;
             <IssuerCheck::<T>>::insert(&minted_issuer, true);
             Self::deposit_event(RawEvent::IssuerCreated(minted_issuer));
         }
 
+        //
         #[weight = 10000]
-        fn issuer_destroy(origin, freeze_issuer: T::AccountId) {
-            let _who = ensure_signed(origin)?;
+        fn issuer_freeze(origin, freeze_issuer: T::AccountId) {
+            T::ApproveIssuer::ensure_origin(origin)?;
             <IssuerCheck::<T>>::insert(&freeze_issuer, false);
             Self::deposit_event(RawEvent::IssuerDestroy(freeze_issuer));
         }
@@ -139,12 +149,14 @@ decl_module! {
             let who = ensure_signed(origin)?;
             ensure!(Deed::<T>::contains_key(&address), Error::<T>::NoSuchProperty);
             let deed_token = <Deed::<T>>::get(&address);
+            ensure!( deed_token.freeze == false, Error::<T>::PropertyFrozen);
             let property_owner = deed_token.owner;
             ensure!(property_owner == who, Error::<T>::NotOwner);
             let new_owner = StreetAddress {
                 address: address.clone(),
-                issuer: deed_token.issuer.clone(),
+                issuer: deed_token.issuer,
                 owner: reciever.clone(),
+                freeze: deed_token.freeze,
             };
             <Deed::<T>>::insert(&address, new_owner);
 
@@ -153,5 +165,40 @@ decl_module! {
 
 
         }
+
+        //freeze deed
+        #[weight = 10_000]
+        fn freeze_member(origin, address: Vec<u8>) {
+            T::FreezeOrigin::ensure_origin(origin)?;           
+            ensure!(Deed::<T>::contains_key(&address), Error::<T>::NoSuchProperty);
+            let deed_token = <Deed::<T>>::get(&address);
+            let frozen = StreetAddress {
+                address: deed_token.address,
+                issuer: deed_token.issuer,
+                owner: deed_token.owner,
+                freeze: true,
+            };
+            <Deed::<T>>::insert( &address, frozen);
+
+            Self::deposit_event(RawEvent::FreezeDeed(address));
+        }
+
+        #[weight = 10_000]
+        fn freeze_owner(origin, address: Vec<u8>) {
+            let who = ensure_signed(origin)?;
+            ensure!(Deed::<T>::contains_key(&address), Error::<T>::NoSuchProperty);
+            let deed_token = <Deed::<T>>::get(&address);
+            ensure!( who == deed_token.owner || who == deed_token.issuer, Error::<T>::NotOwnerOrIssuer);
+            let frozen = StreetAddress {
+                address: deed_token.address,
+                issuer: deed_token.issuer,
+                owner: deed_token.owner,
+                freeze: true,
+            };
+            <Deed::<T>>::insert(&address, frozen);
+            Self::deposit_event(RawEvent::FreezeDeed(address));
+
+        }
+        
     }
 }

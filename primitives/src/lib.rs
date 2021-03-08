@@ -8,8 +8,6 @@ pub use sp_runtime::{
 };
 pub use sp_std::{convert::Into, prelude::*};
 
-#[cfg(test)]
-mod tests;
 
 /// An index to a block.
 pub type BlockNumber = u32;
