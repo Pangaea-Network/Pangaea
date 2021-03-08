@@ -23,7 +23,7 @@ use pangaea_runtime::Block;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Substrate Node".into()
+		"Pangaea Node".into()
 	}
 
 	fn impl_version() -> String {
